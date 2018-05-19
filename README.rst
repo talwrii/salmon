@@ -121,6 +121,18 @@ causes the failure.
 If you contribute new code then your code should have as much coverage as
 possible, with a minimal amount of mocking.
 
+Debugging
+=========
+
+`debug/dump-mail.py` can be used to manually test receiving email together with `swaks`
+
+```
+python tools/dump-mail.py --debug
+swaks  --port 1025 --server localhost  --to test@localhost
+```
+
+This can be useful for debugging.
+
 Security
 --------
 

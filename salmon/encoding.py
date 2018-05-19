@@ -417,7 +417,7 @@ def to_string(mail, envelope_header=False):
     """Returns a canonicalized email string you can use to send or store
     somewhere."""
     msg = to_message(mail).as_string(envelope_header)
-    assert "From nobody" not in msg
+    assert b"From nobody" not in msg
     return msg
 
 
