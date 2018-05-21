@@ -126,10 +126,11 @@ Debugging
 
 `debug/dump-mail.py` can be used to manually test receiving email together with `swaks`
 
-```
-python tools/dump-mail.py --debug
-swaks  --port 1025 --server localhost  --to test@localhost
-```
+..code-block:: sh
+    python tools/dump-mail.py --debug
+    swaks  --port 1025 --server localhost  --to test@localhost # test mail
+    swaks  --port 1025 --server localhost  --to test@localhost --data raw # send a raw email
+
 
 This can be useful for debugging.
 

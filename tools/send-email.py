@@ -10,7 +10,14 @@ from email.mime.text import MIMEText
 import email.policy
 
 PARSER = argparse.ArgumentParser(description='')
-PARSER.add_argument('--html-file', type=str)
+html = PARSER.add_mutually_exclusive_group()
+html.add_argument(
+    '--html-file', type=str,
+    help='Attach this html file')
+html.add_argument(
+    '--html', type=str,
+    help='Html email')
+
 
 
 def main():
@@ -31,6 +38,8 @@ def main():
     if args.html_file:
         with open(args.html_file) as stream:
             html = stream.read()
+    elif args.html:
+        html = args.html
     else:
         html = '<a>html message</a>\n'
 
