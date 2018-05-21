@@ -135,7 +135,7 @@ Debugging
 This can be useful for debugging.
 
 Security
---------
+========
 
 Salmon follows the same security reporting model that has worked for other open
 source projects: If you report a security vulnerability, it will be acted on

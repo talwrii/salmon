@@ -83,6 +83,9 @@ import warnings
 import chardet
 import six
 
+# Ensure email encoding is standard when sending. Maybe break DKIM
+CANONICALIZE_ENCODING = True
+
 DEFAULT_ENCODING = "utf-8"
 DEFAULT_ERROR_HANDLING = "strict"
 CONTENT_ENCODING_KEYS = set(['Content-Type', 'Content-Transfer-Encoding',
@@ -364,6 +367,8 @@ def to_message(mail):
 
     N.B. this changes the original email.message.Message
     """
+    if not CANONICALIZE_ENCODING:
+        return mail.mime_part
     ctype, params = mail.content_encoding['Content-Type']
     if not ctype:
         if mail.parts:
@@ -417,7 +422,13 @@ def to_string(mail, envelope_header=False):
     """Returns a canonicalized email string you can use to send or store
     somewhere."""
     msg = to_message(mail).as_string(envelope_header)
-    assert b"From nobody" not in msg
+
+    # msg unicode in python 3, str in python2
+    if sys.version_info.major == 3:
+        assert "From nobody" not in msg
+    else:
+        assert b"From nobody" not in msg
+
     return msg
 
 

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import email
 from email import encoders
 from email.utils import parseaddr
 import mailbox
@@ -327,6 +328,55 @@ def test_odd_content_type_with_charset():
     msg = encoding.to_string(mail)
     assert msg
 
+
+@patch.object(encoding, 'CANONICALIZE_ENCODING', False)
+def test_dkim_problems():
+    raw = '''\
+Received: by mail-vk0-f46.google.com with SMTP id 1
+ for <me@server.com>; Sun, 20 May 2018 15:58:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed/relaxed; d=server.email;
+ h=content-type:from:mime-version:to:subject; s=s1;
+ bh=IsWL+nRiNsejzYKu0oiD6DGp1LA=; b=IxM2DfNrUHlr+zLXaU01aKDC3yCg/
+ Eeo/jEBGbmGODQp2EtuZs2Ez0O/q/ySN9m4m9Ap61SCyHAnFROnFh3c+BVsH4WHX
+ 2V2phbsIbNsorknyxbDmcne3TBzWXtIw93OngAQ851qA0BIQzXylZ2F73mgc55hR
+ fEGvsp17c3TLmw=
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed/relaxed; d=sendgrid.info;
+ h=content-type:from:mime-version:to:subject:x-feedback-id;
+ s=smtpapi; bh=IsWL+nRiNsejzYKu0oiD6DGp1LA=; b=Adtz7TKIMQI3VETp9s
+ 64kqrkEzsyiQIt4iv9Y1jArpqlbnIsfrJqvP5O04lMlfBjsq68bKzr+CycWLGqqm
+ ft65F66AHtKwOM6ITjhLBe02M1Bqupl1MhyA1EO6bgdjbI9FRB+RJzGv1aeg77Ab
+ 0F8s6ybyJnSBzZRx0BjTgVmv0=
+Content-Type: multipart/alternative;
+ boundary=1d0b05347969c6444d2bddf5cca82c22e37e478e2b4abc7e96ac35c9c5d2
+Date: Sun, 20 May 2018 22:58:38 +0000 (UTC)
+Mime-Version: 1.0
+To: attrigh@gmail.com
+Subject: Subject
+
+    --1d0b05347969c6444d2bddf5cca82c22e37e478e2b4abc7e96ac35c9c5d2
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+
+boring
+
+--1d0b05347969c6444d2bddf5cca82c22e37e478e2b4abc7e96ac35c9c5d2
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset=UTF-8
+Mime-Version: 1.0
+
+tab
+=09=09=09
+play
+
+--1d0b05347969c6444d2bddf5cca82c22e37e478e2b4abc7e96ac35c9c5d2--
+
+'''
+    original = encoding.MailBase(email.message_from_string(raw))
+    round_tripped = encoding.from_string(encoding.to_string(original))
+
+    assert round_tripped.mime_part.as_string() == raw
+    
 
 def test_specially_borked_lua_message():
     msg = encoding.from_file(open("tests/borked.msg", "rb"))

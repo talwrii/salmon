@@ -140,3 +140,22 @@ and port Salmon uses. You can also switch out ``LMTPReceiver`` for
 
     ``LMTPReceiver`` is unaffected by this issue and implements the LMTP
     protocol fully.
+
+DKIM
+----
+
+[DKIM](https://tools.ietf.org/html/rfc5585) is a standard for signing emails that uses DNS as a certificate store.
+DKIM's related standard *DMARC* may result in your mail server [silently refusing to accept email messages that have been modified](https://tools.ietf.org/html/rfc7489#section-10.3) if an email has been in any way modified, assuming that your mail server is adopting the standard (which, for example, gmail does).
+
+This is somewhat problematic for forwarders like salmon, since they must be careful in some circumstances not to modify email messages.
+
+By default salmon aggressively normalizes messages, potentially breaking DKIM forwarding. This normalization can be avoided by setting
+
+```
+import salmon.encoding
+salmon.encoding.CANONICALIZE_ENCODING = False
+```
+
+in one of your settings files.
+
+An alternative approach is to [man-in-the-middle](https://en.wikipedia.org/wiki/Man-in-the-middle_attack) the exchanges taking responsibility for forwarding both incoming and outgoing email addresses, or make use of the ReplyTo header, which appears to [be ignored by DKIM](https://stackoverflow.com/questions/29112817/will-setting-a-reply-to-address-at-a-different-domain-result-in-spam).
